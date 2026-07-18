@@ -151,3 +151,23 @@ Không cần sửa controller, routes, frontend hoặc database schema vì front
 - Backend dùng `@supabase/supabase-js` với service role key để insert/update `orders` và `payments`.
 - Frontend không gọi Supabase trực tiếp để tránh lộ service role key và giữ payment flow tập trung ở backend.
 - Nếu bật Row Level Security cho bảng, service role key vẫn bypass RLS. Nếu muốn dùng anon key, cần tạo policy insert/update phù hợp, nhưng không khuyến nghị cho demo payment callback.
+
+## Lỗi Thường Gặp
+
+### Cannot create order: new row violates row-level security policy for table "orders"
+
+Lỗi này xảy ra khi Supabase chặn insert do Row Level Security. Với project này, backend phải dùng `service_role key` để bypass RLS.
+
+Cách xử lý:
+
+1. Vào Supabase Dashboard -> Project Settings -> API.
+2. Copy key ở mục `service_role` hoặc `secret keys`, không copy `anon public` key.
+3. Dán vào `server/.env`:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+4. Restart backend sau khi sửa `.env`.
+
+Không đưa `SUPABASE_SERVICE_ROLE_KEY` vào `client/.env` hoặc code frontend.
