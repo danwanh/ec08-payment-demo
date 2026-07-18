@@ -45,6 +45,7 @@ cp server/.env.example server/.env
 ```env
 PORT=4000
 CLIENT_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173,https://your-vercel-domain.vercel.app,https://*.vercel.app
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 VNPAY_TMN_CODE=YOUR_TMN_CODE
@@ -151,6 +152,7 @@ Không cần sửa controller, routes, frontend hoặc database schema vì front
 - Backend dùng `@supabase/supabase-js` với service role key để insert/update `orders` và `payments`.
 - Frontend không gọi Supabase trực tiếp để tránh lộ service role key và giữ payment flow tập trung ở backend.
 - Nếu bật Row Level Security cho bảng, service role key vẫn bypass RLS. Nếu muốn dùng anon key, cần tạo policy insert/update phù hợp, nhưng không khuyến nghị cho demo payment callback.
+- `CORS_ORIGINS` nhận nhiều origin phân tách bằng dấu phẩy. Có thể dùng wildcard cho Vercel preview domain, ví dụ `https://*.vercel.app`.
 
 ## Lỗi Thường Gặp
 

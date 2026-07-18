@@ -2,9 +2,32 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function normalizeOrigin(origin: string): string {
+  if (origin.includes('*')) {
+    return origin.replace(/\/$/, '');
+  }
+
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return origin.replace(/\/$/, '');
+  }
+}
+
+function parseOrigins(value: string | undefined): string[] {
+  return (value ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .map(normalizeOrigin);
+}
+
+const clientUrl = normalizeOrigin(process.env.CLIENT_URL ?? 'http://localhost:5173');
+
 export const env = {
   port: Number(process.env.PORT ?? 4000),
-  clientUrl: process.env.CLIENT_URL ?? 'http://localhost:5173',
+  clientUrl,
+  corsOrigins: Array.from(new Set([clientUrl, ...parseOrigins(process.env.CORS_ORIGINS)])),
   supabase: {
     url: process.env.SUPABASE_URL ?? '',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''

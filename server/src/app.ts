@@ -7,6 +7,21 @@ import { PaymentRepository } from './repositories/paymentRepository.js';
 import { PaymentService } from './services/paymentService.js';
 import { VNPayProvider } from './providers/vnpayProvider.js';
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function isAllowedOrigin(origin: string): boolean {
+  return env.corsOrigins.some((allowedOrigin) => {
+    if (!allowedOrigin.includes('*')) {
+      return origin === allowedOrigin;
+    }
+
+    const pattern = `^${allowedOrigin.split('*').map(escapeRegex).join('.*')}$`;
+    return new RegExp(pattern).test(origin);
+  });
+}
+
 export function createApp() {
   const app = express();
   const paymentService = new PaymentService(
@@ -15,7 +30,18 @@ export function createApp() {
     new PaymentRepository()
   );
 
-  app.use(cors({ origin: env.clientUrl }));
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || isAllowedOrigin(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error(`CORS origin is not allowed: ${origin}`));
+      }
+    })
+  );
   app.use(express.json());
 
   app.get('/health', (_req, res) => res.json({ ok: true }));
