@@ -6,6 +6,7 @@ import { OrderRepository } from './repositories/orderRepository.js';
 import { PaymentRepository } from './repositories/paymentRepository.js';
 import { PaymentService } from './services/paymentService.js';
 import { VNPayProvider } from './providers/vnpayProvider.js';
+import { StripeProvider } from './providers/stripeProvider.js';
 
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -25,7 +26,7 @@ function isAllowedOrigin(origin: string): boolean {
 export function createApp() {
   const app = express();
   const paymentService = new PaymentService(
-    [new VNPayProvider()],
+    [new VNPayProvider(), new StripeProvider()],
     new OrderRepository(),
     new PaymentRepository()
   );
