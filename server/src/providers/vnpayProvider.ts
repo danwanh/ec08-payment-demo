@@ -27,11 +27,10 @@ export class VNPayProvider implements PaymentProvider {
     };
 
     const signedParams = this.signParams(params);
-    const searchParams = new URLSearchParams(signedParams);
 
     return {
       transactionId,
-      paymentUrl: `${env.vnpay.paymentUrl}?${searchParams.toString()}`
+      paymentUrl: `${env.vnpay.paymentUrl}?${this.stringifyParams(signedParams)}`
     };
   }
 
@@ -70,8 +69,13 @@ export class VNPayProvider implements PaymentProvider {
   }
 
   private hashParams(params: Record<string, string>): string {
-    const searchParams = new URLSearchParams(this.sortParams(params));
-    return crypto.createHmac('sha512', env.vnpay.hashSecret).update(searchParams.toString()).digest('hex');
+    return crypto.createHmac('sha512', env.vnpay.hashSecret).update(this.stringifyParams(this.sortParams(params))).digest('hex');
+  }
+
+  private stringifyParams(params: Record<string, string>): string {
+    return Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
   }
 
   private sortParams(params: Record<string, string>): Record<string, string> {
