@@ -12,7 +12,7 @@ export class StripeProvider implements PaymentProvider {
     const stripe = this.getClient();
     const transactionId = `stripe-${input.orderId}-${Date.now()}`;
     const successUrl = `${env.stripe.returnUrl}?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${env.stripe.returnUrl}?status=failed`;
+    const cancelUrl = `${env.stripe.returnUrl}?orderId=${input.orderId}&status=failed`;
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -54,8 +54,10 @@ export class StripeProvider implements PaymentProvider {
     const sessionId = this.getQueryValue(query.session_id);
 
     if (!sessionId) {
+      const orderId = Number(this.getQueryValue(query.orderId) ?? 0);
+
       return {
-        orderId: 0,
+        orderId,
         transactionId: '',
         amount: 0,
         status: 'failed',
