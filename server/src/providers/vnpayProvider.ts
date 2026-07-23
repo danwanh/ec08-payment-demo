@@ -22,7 +22,6 @@ export class VNPayProvider implements PaymentProvider {
       vnp_OrderType: 'other',
       vnp_Locale: 'vn',
       vnp_ReturnUrl: env.vnpay.returnUrl,
-      vnp_IpnUrl: env.vnpay.ipnUrl,
       vnp_IpAddr: input.ipAddress,
       vnp_CreateDate: this.formatVNPayDate(createdAt)
     };

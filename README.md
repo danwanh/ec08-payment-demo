@@ -156,9 +156,10 @@ Code chính nằm trong `server/src/providers/vnpayProvider.ts`.
 - `vnp_OrderType`: loại đơn hàng, hiện là `other`.
 - `vnp_Locale`: ngôn ngữ, hiện là `vn`.
 - `vnp_ReturnUrl`: lấy từ `VNPAY_RETURN_URL`.
-- `vnp_IpnUrl`: lấy từ `VNPAY_IPN_URL`.
 - `vnp_IpAddr`: IP người thanh toán.
 - `vnp_CreateDate`: thời gian tạo giao dịch theo format `yyyyMMddHHmmss`.
+
+IPN URL không được đưa vào danh sách tham số tạo payment URL để tránh lệch chữ ký. Nếu tài khoản VNPay yêu cầu, cấu hình `VNPAY_IPN_URL` trong cổng merchant VNPay hoặc gửi theo đúng hình thức mà VNPay cấp riêng cho tài khoản đó.
 
 Sau đó provider sort params theo tên key, ký bằng HMAC SHA512 với `VNPAY_HASH_SECRET`, thêm `vnp_SecureHash`, rồi ghép thành URL:
 
