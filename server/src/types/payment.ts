@@ -23,7 +23,13 @@ export interface VerifyPaymentResult {
   transactionId: string;
   amount: number;
   status: PaymentStatus;
+  isValidSignature?: boolean;
   rawResponse: Record<string, unknown>;
+}
+
+export interface PaymentIpnResponse {
+  RspCode: string;
+  Message: string;
 }
 
 export interface PaymentProvider {
@@ -31,4 +37,5 @@ export interface PaymentProvider {
   name: string;
   createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult>;
   verifyReturn(query: Record<string, string | string[] | undefined>): Promise<VerifyPaymentResult>;
+  verifyIpn?(query: Record<string, string | string[] | undefined>): VerifyPaymentResult;
 }

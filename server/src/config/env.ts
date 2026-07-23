@@ -36,7 +36,8 @@ export const env = {
     tmnCode: process.env.VNPAY_TMN_CODE ?? '',
     hashSecret: process.env.VNPAY_HASH_SECRET ?? '',
     paymentUrl: process.env.VNPAY_PAYMENT_URL ?? 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
-    returnUrl: process.env.VNPAY_RETURN_URL ?? 'http://localhost:4000/api/payments/vnpay/return'
+    returnUrl: process.env.VNPAY_RETURN_URL ?? 'http://localhost:4000/api/payments/vnpay/return',
+    ipnUrl: process.env.VNPAY_IPN_URL ?? 'http://localhost:4000/api/payments/vnpay/ipn'
   },
   stripe: {
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? '',

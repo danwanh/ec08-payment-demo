@@ -22,6 +22,7 @@ export class VNPayProvider implements PaymentProvider {
       vnp_OrderType: 'other',
       vnp_Locale: 'vn',
       vnp_ReturnUrl: env.vnpay.returnUrl,
+      vnp_IpnUrl: env.vnpay.ipnUrl,
       vnp_IpAddr: input.ipAddress,
       vnp_CreateDate: this.formatVNPayDate(createdAt)
     };
@@ -37,6 +38,16 @@ export class VNPayProvider implements PaymentProvider {
   async verifyReturn(query: Record<string, string | string[] | undefined>): Promise<VerifyPaymentResult> {
     this.ensureConfigured();
 
+    return this.verifyPaymentResult(query);
+  }
+
+  verifyIpn(query: Record<string, string | string[] | undefined>): VerifyPaymentResult {
+    this.ensureConfigured();
+
+    return this.verifyPaymentResult(query);
+  }
+
+  private verifyPaymentResult(query: Record<string, string | string[] | undefined>): VerifyPaymentResult {
     const params = this.normalizeQuery(query);
     const secureHash = params.vnp_SecureHash;
     delete params.vnp_SecureHash;
@@ -44,14 +55,17 @@ export class VNPayProvider implements PaymentProvider {
 
     const expectedHash = this.hashParams(params);
     const transactionId = params.vnp_TxnRef;
-    const orderId = Number(transactionId.split('-')[0]);
+    const orderId = Number((transactionId ?? '').split('-')[0]);
     const amount = Number(params.vnp_Amount) / 100;
+    const isValidSignature = secureHash === expectedHash;
+    const isSuccessful = params.vnp_ResponseCode === '00' && (params.vnp_TransactionStatus ?? '00') === '00';
 
     return {
       orderId,
       transactionId,
       amount,
-      status: secureHash === expectedHash && params.vnp_ResponseCode === '00' ? 'paid' : 'failed',
+      status: isValidSignature && isSuccessful ? 'paid' : 'failed',
+      isValidSignature,
       rawResponse: { ...params, vnp_SecureHash: secureHash }
     };
   }

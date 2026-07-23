@@ -9,6 +9,20 @@ export interface OrderRecord {
 }
 
 export class OrderRepository {
+  async findById(orderId: number): Promise<OrderRecord | null> {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('id, amount, payment_status, created_at')
+      .eq('id', orderId)
+      .maybeSingle<OrderRecord>();
+
+    if (error) {
+      throw new Error(`Cannot find order: ${error.message}`);
+    }
+
+    return data;
+  }
+
   async create(amount: number): Promise<OrderRecord> {
     const { data, error } = await supabase
       .from('orders')

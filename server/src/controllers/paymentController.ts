@@ -45,5 +45,14 @@ export function createPaymentRouter(paymentService: PaymentService): Router {
     }
   });
 
+  router.get('/:provider/ipn', async (req, res, next) => {
+    try {
+      const result = await paymentService.handleIpn(req.params.provider, toPaymentQuery(req.query));
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }

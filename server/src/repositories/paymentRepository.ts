@@ -10,7 +10,32 @@ export interface CreatePaymentRecordInput {
   rawResponse?: Record<string, unknown>;
 }
 
+export interface PaymentRecord {
+  id: number;
+  order_id: number;
+  provider: string;
+  transaction_id: string;
+  amount: number;
+  status: PaymentStatus;
+  raw_response: Record<string, unknown>;
+  created_at: string;
+}
+
 export class PaymentRepository {
+  async findByTransactionId(transactionId: string): Promise<PaymentRecord | null> {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('id, order_id, provider, transaction_id, amount, status, raw_response, created_at')
+      .eq('transaction_id', transactionId)
+      .maybeSingle<PaymentRecord>();
+
+    if (error) {
+      throw new Error(`Cannot find payment: ${error.message}`);
+    }
+
+    return data;
+  }
+
   async create(input: CreatePaymentRecordInput): Promise<void> {
     const { error } = await supabase.from('payments').insert({
       order_id: input.orderId,
